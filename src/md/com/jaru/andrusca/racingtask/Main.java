@@ -11,16 +11,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
+    public static final String WORKING_DIR_ARG = "-workingdir";
+    public static final String ARG_VALUE_SEPARATOR = "=";
+    public static final int MAX_RACER_NAME_COLUMN_WIDTH = 100;
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+    public static final String RESULT_FILE_EXTENSION = ".calculated";
+
     public static void main(String[] args) {
-        if (args.length != 1 || !args[0].startsWith("-workingdir")) {
-            System.err.println("You must specify parameter '-workingdir' with path");
-            System.exit(1);
+        try {
+            validateWorkingDirArgument(args);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
         }
 
-        String[] keyAndValue = args[0].split("=");
+
+        String[] keyAndValue = args[0].split(ARG_VALUE_SEPARATOR);
         if (keyAndValue.length != 2) {
-            System.err.println("You must specify parameter '-workingdir'" +
-                    " with correct format : 'workingdir={value}");
+            System.err.println("You must specify parameter '" + WORKING_DIR_ARG +
+                    "' with correct format : '" + WORKING_DIR_ARG + "'={value}");
             System.exit(1);
         }
 
@@ -60,6 +68,13 @@ public class Main {
         }
 
 
+    }
+
+    private static void validateWorkingDirArgument(String[] args) {
+        if (args.length != 1 || !args[0].startsWith(WORKING_DIR_ARG)) {
+            String errorMessage = "You must specify parameter '" + WORKING_DIR_ARG + "' with path";
+            throw new IllegalArgumentException(errorMessage);
+        }
     }
 
     private static void processFile(Path filePath) {
@@ -106,9 +121,11 @@ public class Main {
                 .map(roundData1 -> roundData1.getRacerName().length())
                 .max(Integer::compareTo)
                 .get();
+        maxNameLenght = maxNameLenght > MAX_RACER_NAME_COLUMN_WIDTH ?
+                MAX_RACER_NAME_COLUMN_WIDTH
+                : maxNameLenght;
 
         String pattern = "|%3s|%" + maxNameLenght + "s|%4s|%12s|\n";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
 
         StringBuilder result = new StringBuilder();
 
@@ -117,14 +134,14 @@ public class Main {
             result.append(pattern.formatted(
                     roundStringEntry.getRacerName(),
                     roundStringEntry.getNumber(),
-                    roundStringEntry.getTime().format(formatter)
+                    roundStringEntry.getTime().format(FORMATTER)
             ));
         }
 
         addHeaders(result, maxNameLenght);
         try {
             String baseDir = filePath.getParent().toString();
-            String newFileName = getFileBaseName(filePath.getFileName().toString() + "" + ".calculated");
+            String newFileName = getFileBaseName(filePath.getFileName().toString() + RESULT_FILE_EXTENSION);
             Path outputPath = Path.of(baseDir, newFileName);
             Files.writeString(outputPath, result.toString(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         } catch (IOException e) {
