@@ -49,7 +49,8 @@ public class WorkingDirArgumentParser {
         if (!Files.isDirectory(dirPath)) {
             throw new WrongArgumentException("Path is related to wrong directory");
         }
-        if (fileProcessor.openDirectoryStream(dirPath)) {
+        if (fileProcessor.openDirectoryStream(dirPath).iterator().hasNext()) {
+
         }
 
 
