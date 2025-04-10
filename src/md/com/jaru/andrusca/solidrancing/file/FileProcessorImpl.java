@@ -21,6 +21,11 @@ public class FileProcessorImpl implements FileProcessor {
 
     }
 
+    @Override
+    public List<String> readFile(Path filePath) {
+        return List.of();
+    }
+
     public void write(Path path, List<String> lines) {
         try {
             Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
