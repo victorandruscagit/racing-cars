@@ -47,13 +47,14 @@ public class WorkingDirArgumentParser {
             throw new WrongArgumentException("Wrong value of directory path, " + e);
         }
         if (!Files.isDirectory(dirPath)) {
-            throw new WrongArgumentException("Path is related to wrong directory");
+            throw new WrongArgumentException("Path is related with no correct  directory");
         }
-        if (fileProcessor.openDirectoryStream(dirPath).iterator().hasNext()) {
-
+        if (!fileProcessor.openDirectoryStream(dirPath).iterator().hasNext()) {
+            throw new WrongArgumentException("Path is related with no correct  directory: it is emmtpy");
         }
 
 
+        return dirPath;
     }
 
 

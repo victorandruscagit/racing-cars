@@ -6,4 +6,5 @@ import java.nio.file.Path;
 public interface FileProcessor {
     public DirectoryStream<Path> openDirectoryStream(Path dirPath);
 
+
 }
